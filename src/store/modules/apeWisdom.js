@@ -15,7 +15,7 @@ export default {
         commit('saveApePages', data)
       }
       catch (err) {
-        throw err;
+        throw new Error(err);
       }
     },
     async fetchStocks({ commit, dispatch, state }) {
@@ -23,17 +23,18 @@ export default {
         await dispatch('fetchPages');
       }
       catch (err) {
-        throw err;
+        throw new Error(err);
       }
-
+      
+      const promises = [];
       for(let i = 1; i <= state.pages; i++) {
-        try {
-          const data = await apeWisdom.getApeStocks(i);
-          commit('saveApeStocks', data)
-        }
-        catch (err) {
-          throw err;
-        }
+        promises.push(apeWisdom.getApeStocks(i));
+      }
+      try {
+        await Promise.all(promises).then(values => values.forEach(el => commit('saveApeStocks', el)));
+      }
+      catch (err) {
+        throw new Error(err);
       }
     }
   },

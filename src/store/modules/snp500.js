@@ -5,6 +5,19 @@ export default {
   state() {
     return {
       snp500: [],
+      GICS: [
+        'Energy',
+        'Materials',
+        'Industrials',
+        'Consumer Discretionary',
+        'Consumer Staples',
+        'Health Care',
+        'Financials',
+        'Information Technology',
+        'Communication Services',
+        'Utilities',
+        'Real Estate'
+      ],
     }
   },
   actions: {
@@ -14,7 +27,7 @@ export default {
         commit('saveSnp500', data);
       }
       catch (err) {
-        throw err;
+        throw new Error(err);
       }
     }
   },
@@ -25,6 +38,7 @@ export default {
           ticker: el.split('\n')[0].split('|')[1].replace('}}','').split(' <!')[0],
           exchange: el.split('\n')[0].split('|')[0].replace('{{','').replace('Symbol',''),
           name: el.split('|[[')[1].split(']]')[0],
+          GICS: el.split('||')[2].trim()
         };
       });
     },
