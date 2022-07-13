@@ -1,18 +1,26 @@
 <template>
-  <div class="home">
-    <TreeMap v-if="dataLoaded" :stocks="tree"/>
-    <span v-else>Loading...</span>
-  </div>
+  <el-container class="home">
+    <el-main>
+        <el-row :gutter="20">
+          <el-col :sm="24" :lg="16">      
+            <TreeMap :stocks="stocks"/>
+          </el-col>
+          <el-col :sm="24" :lg="8">
+            <StockList :stocks="stocks"/>
+          </el-col>
+        </el-row>
+    </el-main>
+  </el-container>
 </template>
 
 <script>
 import TreeMap from '@components/TreeMap.vue';
-
+import StockList from './components/StockList.vue';
 import { mapState, mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'Home',
-  components: { TreeMap },
+  components: { TreeMap, StockList },
   data() {
     return {
       dataLoaded: false,
@@ -23,17 +31,16 @@ export default {
       fetchSnp500: 'snp500/fetchSnp500',
       fetchApeStocks: 'apeWisdom/fetchStocks',
     }),
-    
+    async fetchData() {
+      await this.fetchSnp500();
+      await this.fetchApeStocks();
+    }
   },
   computed: {
     ...mapState({
       snp500: state => state.snp500.snp500,
       apeStocks: state => state.apeWisdom.apeStocks,
       GICS: state => state.snp500.GICS,
-    }),
-
-    ...mapGetters({
-      snp500Tickers: 'snp500/getTickers',
     }),
     
     stocks() {
@@ -45,53 +52,17 @@ export default {
           result.push(stock);
         }
       }
-      return result.sort((a, b) => {
-        if (a.rank > b.rank) {
-          return 1;
-        } else if (a.rank < b.rank) {
-          return -1;
-        } else {
-          return 0;
-        }
-      });
+      return result
     },
-
-    tree() {
-      const tree = this.GICS.reduce((acc, cur) => {
-        acc.push({ name: cur, children: [] });
-        return acc
-      }, []);
-      this.stocks.forEach(stock => {
-        const treeItem = tree.find(el => el.name === stock.GICS);
-        if (treeItem) {
-          treeItem.children.push({ name: stock.ticker, value: +stock.mentions })
-        }
-      })
-      return tree;
-    }
   },
 
   async created() {
-    try {
-      await this.fetchSnp500();
-      await this.fetchApeStocks();
-      this.dataLoaded = true;
-    }
-    catch (err) {
-      throw(err);
-    }
+    await this.fetchData();
+    this.dataLoaded = true;
   }
 }
 </script>
 
 <style scoped>
- button {
-  display: block;
- }
- li {
-  display: flex;
- }
- span {
-  margin: 5px;
- }
+
 </style>
