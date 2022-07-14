@@ -1,9 +1,16 @@
 <template>
   <div class="tree-map">
-     <el-radio-group class="tree-map__controls" v-model="units" size="large">
-      <el-radio-button label="mentions">Mentions</el-radio-button>
-      <el-radio-button label="upvotes">Upvotes</el-radio-button>
-    </el-radio-group>
+    <el-form :inline="true" class="tree-map__form">
+      <el-form-item label="Units">
+        <el-radio-group v-model="units" size="default">
+          <el-radio-button label="mentions">Mentions</el-radio-button>
+          <el-radio-button label="upvotes">Upvotes</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="Threshold">
+        <el-input-number size="default" v-model="threshold" :min="0" :precision="0" :step="1"/>
+      </el-form-item>
+    </el-form>
     <div id="chartdiv" ref="chartdiv"></div>
   </div>
 </template>
@@ -15,17 +22,51 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
-  name: "TreeMap",
-  props: ["stocks"],
+  name: 'TreeMap',
   data() {
     return {
       units: "mentions",
       threshold: 5
     };
   },
-  methods: {
-    renderChart() {
-      const rootChart = am5.Root.new(this.$refs.chartdiv);
+  computed: {
+    ...mapState({
+      snp500: state => state.snp500.snp500,
+      apeStocks: state => state.apeWisdom.apeStocks,
+      GICS: (state) => state.snp500.GICS,
+    }),
+    stocks() {
+      const result = [];
+      for(let i = 0; i < this.snp500.length; i ++) {
+        const stock = this.apeStocks.find(el => el.ticker === this.snp500[i].ticker);
+        if (stock) {
+          stock.GICS = this.snp500[i].GICS;
+          result.push(stock);
+        }
+      }
+      return result;
+    },
+    tree() {
+      const tree = this.GICS.reduce((acc, cur) => {
+        acc.push({ name: cur, children: [] });
+        return acc;
+      }, []);
+      this.stocks.forEach((stock) => {
+        const treeItem = tree.find((el) => el.name === stock.GICS);
+        if (treeItem && +stock.mentions > this.threshold) {
+          treeItem.children.push({
+            ticker: stock.ticker,
+            name: stock.name,
+            units: this.units,
+            value: +stock[this.units],
+          });
+        }
+      });
+      return tree;
+    },
+  },
+  mounted() {
+    const rootChart = am5.Root.new(this.$refs.chartdiv);
       rootChart.setThemes([am5themes_Animated.new(rootChart)]);
       const chart = rootChart.container.children.push(
         am5.Container.new(rootChart, {
@@ -48,7 +89,6 @@ export default {
 
       series.rectangles.template.adapters.add("fill", function (fill, target) {
         const value = target.dataItem.get("value");
-
         if (value >= 100) {
           return am5.color(0xF53B3B);
         }
@@ -84,7 +124,7 @@ export default {
 
       series.nodes.template.set(
         "tooltipText",
-        "[bold]{name}[/]\nMentions: {sum}"
+        `[bold]{name}[/]\n${this.units[0].toUpperCase() + this.units.slice(1)}: {sum}`
       );
 
       series.data.setAll([
@@ -93,43 +133,25 @@ export default {
           children: this.tree,
         },
       ]);
-
+      this.series = series;
       this.rootChart = rootChart;
-    },
-  },
-  computed: {
-    ...mapState({
-      GICS: (state) => state.snp500.GICS,
-    }),
-    tree() {
-      const tree = this.GICS.reduce((acc, cur) => {
-        acc.push({ name: cur, children: [] });
-        return acc;
-      }, []);
-      this.stocks.forEach((stock) => {
-        const treeItem = tree.find((el) => el.name === stock.GICS);
-        if (treeItem && +stock.mentions > this.threshold) {
-          treeItem.children.push({
-            ticker: stock.ticker,
-            name: stock.name,
-            units: this.units,
-            value: +stock[this.units],
-          });
-        }
-      });
-      return tree;
-    },
-  },
-  
-  mounted() {
-    this.renderChart();
   },
   watch: {
-    tree(next, old) {
-      this.rootChart.dispose();
-      this.renderChart()
-    },
-  },
+    tree() {
+      if (this.rootChart) {
+        this.series.nodes.template.set(
+          "tooltipText",
+          `[bold]{name}[/]\n${this.units[0].toUpperCase() + this.units.slice(1)}: {sum}`
+        );
+        this.series.data.setAll([
+          {
+            name: "Reddit disease map",
+            children: this.tree,
+          },
+        ]);
+      }
+    }
+  },  
   beforeUnmount() {
     if (this.rootChart) {
       this.rootChart.dispose();
@@ -139,15 +161,6 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.tree-map {
-  width: 100%;
-  &__controls {
-    display: block;
-  }
-  &__button {
-    width: 200px;
-  }
-}
 #chartdiv {
   width: 100%;
   height: 90vh;

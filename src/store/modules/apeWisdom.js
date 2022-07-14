@@ -12,7 +12,7 @@ export default {
     async fetchPages({ commit }) {
       try {
         const data = await apeWisdom.getApePages();
-        commit('saveApePages', data)
+        commit('saveApePages', data);
       }
       catch (err) {
         throw new Error(err);
@@ -31,7 +31,13 @@ export default {
         promises.push(apeWisdom.getApeStocks(i));
       }
       try {
-        await Promise.all(promises).then(values => values.forEach(el => commit('saveApeStocks', el)));
+        await Promise.all(promises).then(values => {
+          const result = values.reduce((acc, cur) => { 
+            acc.push(...cur.results)
+            return acc;
+          }, []);
+          commit('saveApeStocks', result);
+        });
       }
       catch (err) {
         throw new Error(err);
@@ -43,12 +49,13 @@ export default {
       state.pages = data;
     },
     saveApeStocks(state, data) {
-      state.apeStocks.push(...data.results);
+      state.apeStocks.push(...data);
+      console.log('apes saved');
     }
   },
   getters: {
     getTickers(state) {
-      return state.apeStocks.map(el => el.ticker)
+      return state.apeStocks.map(el => el.ticker);
     }
   }
 }

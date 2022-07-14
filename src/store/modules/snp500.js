@@ -41,6 +41,7 @@ export default {
           GICS: el.split('||')[2].trim()
         };
       });
+      console.log('snp500 saved')
     },
 
   },
