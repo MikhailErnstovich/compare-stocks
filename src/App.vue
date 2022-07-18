@@ -18,6 +18,9 @@ export default {
 #app {
   font-family: Arial, Helvetica, sans-serif;
 }
+html, body {
+  overflow-x: hidden;
+}
 /*====================================
 CSS RESET
 ====================================== */

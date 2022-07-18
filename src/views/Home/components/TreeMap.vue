@@ -1,16 +1,5 @@
 <template>
   <div class="tree-map">
-    <el-form :inline="true" class="tree-map__form">
-      <el-form-item label="Units">
-        <el-radio-group v-model="units" size="default">
-          <el-radio-button label="mentions">Mentions</el-radio-button>
-          <el-radio-button label="upvotes">Upvotes</el-radio-button>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Threshold">
-        <el-input-number size="default" v-model="threshold" :min="0" :precision="0" :step="1"/>
-      </el-form-item>
-    </el-form>
     <div id="chartdiv" ref="chartdiv"></div>
   </div>
 </template>
@@ -23,17 +12,13 @@ import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
   name: 'TreeMap',
-  data() {
-    return {
-      units: "mentions",
-      threshold: 5
-    };
-  },
   computed: {
     ...mapState({
       snp500: state => state.snp500.snp500,
       apeStocks: state => state.apeWisdom.apeStocks,
-      GICS: (state) => state.snp500.GICS,
+      GICS: state => state.snp500.GICS,
+      threshold: state => state.treeMap.threshold,
+      units: state => state.treeMap.units,
     }),
     stocks() {
       const result = [];
@@ -163,6 +148,6 @@ export default {
 <style lang='scss' scoped>
 #chartdiv {
   width: 100%;
-  height: 90vh;
+  height: 80vh;
 }
 </style>

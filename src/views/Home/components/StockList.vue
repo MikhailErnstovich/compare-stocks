@@ -2,6 +2,7 @@
   <el-table style="width: 100%"
     :data="stocks" 
     :default-sort="{ prop: 'mentions', order: 'descending' }"
+    stripe
     height="95vh"
   >
     <el-table-column type="index" />
@@ -46,29 +47,5 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-  .stock-list {
-    &__header {
-      font-weight: bold;
-    }
-    &__header,
-    &__item {
-      display: flex;
-      height: 1.5em;
-      span{
-        display: block;
-        text-overflow: ellipsis;
-        &:first-child,
-        &:nth-child(2) {
-          width: 10%;
-        }
-        &:nth-child(3) {
-          width: 40%;
-        }
-        &:nth-child(4),
-        &:nth-child(5) {
-          width: 20%;
-        }
-      }
-    }
-  }
+
 </style>
