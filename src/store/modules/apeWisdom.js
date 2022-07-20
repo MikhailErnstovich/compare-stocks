@@ -6,6 +6,7 @@ export default {
     return {
       apeStocks: [],
       pages: 0,
+      dataLoaded: false,
     }
   },
   actions: {
@@ -50,6 +51,7 @@ export default {
     },
     saveApeStocks(state, data) {
       state.apeStocks.push(...data);
+      state.dataLoaded = true;
       console.log('apes saved');
     }
   },

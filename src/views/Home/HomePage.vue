@@ -63,12 +63,16 @@ export default {
       fetchApeStocks: "apeWisdom/fetchStocks",
       toggleList: "home/toggleList",
     }),
-    fetchData() {
-      this.fetchSnp500();
-      this.fetchApeStocks();
+    async fetchData() {
+      await this.fetchSnp500();
+      await this.fetchApeStocks();
     },
   },
   computed: {
+    ...mapState({
+      snp500Loaded: state => state.snp500.dataLoaded,
+      apeStocksLoaded: state => state.apeWisdom.dataLoaded,
+    }),
     listToggle: {
       get() {
         return this.$store.state.home.listToggle;
@@ -78,8 +82,13 @@ export default {
       },
     },
   },
-  mounted() {
-    this.fetchData();
+  async created() {
+    if (!this.snp500Loaded) {
+      await this.fetchSnp500();
+    }
+    if (!this.apeStocksLoaded) {
+      await this.fetchApeStocks();
+    }
   },
 };
 </script>

@@ -18,6 +18,7 @@ export default {
         'Utilities',
         'Real Estate'
       ],
+      dataLoaded: false,
     }
   },
   actions: {
@@ -41,6 +42,7 @@ export default {
           GICS: el.split('||')[2].trim()
         };
       });
+      state.dataLoaded = true;
       console.log('snp500 saved')
     },
 
