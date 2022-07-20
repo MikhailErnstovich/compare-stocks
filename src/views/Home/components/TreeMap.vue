@@ -22,7 +22,7 @@ export default {
     }),
     stocks() {
       const result = [];
-      for(let i = 0; i < this.snp500.length; i ++) {
+      for(let i = 0; i < this.snp500.length; i++) {
         const stock = this.apeStocks.find(el => el.ticker === this.snp500[i].ticker);
         if (stock) {
           stock.GICS = this.snp500[i].GICS;
@@ -52,93 +52,93 @@ export default {
   },
   mounted() {
     const rootChart = am5.Root.new(this.$refs.chartdiv);
-      rootChart.setThemes([am5themes_Animated.new(rootChart)]);
-      const chart = rootChart.container.children.push(
-        am5.Container.new(rootChart, {
-          width: am5.percent(100),
-          height: am5.percent(100),
-          layout: rootChart.verticalLayout,
-        })
-      );
-      // Create series and set data
-      const series = chart.children.push(
-        am5hierarchy.Treemap.new(rootChart, {
-          valueField: "value",
-          categoryField: "name",
-          childDataField: "children",
-          initialDepth: 2,
-          topDepth: 0,
-          layoutAlgorithm: "squarify"
-        })
-      );
+    rootChart.setThemes([am5themes_Animated.new(rootChart)]);
+    const chart = rootChart.container.children.push(
+      am5.Container.new(rootChart, {
+        width: am5.percent(100),
+        height: am5.percent(100),
+        layout: rootChart.verticalLayout,
+      })
+    );
+    // Create series and set data
+    const series = chart.children.push(
+      am5hierarchy.Treemap.new(rootChart, {
+        valueField: "value",
+        categoryField: "name",
+        childDataField: "children",
+        initialDepth: 2,
+        topDepth: 0,
+        layoutAlgorithm: "squarify"
+      })
+    );
 
-      series.rectangles.template.adapters.add("fill", function (fill, target) {
-        const value = target.dataItem.get("value");
-        if (value >= 100) {
-          return am5.color(0xF53B3B);
-        }
-        if (value >= 80 && value < 100) {
-          return am5.color(0xFFD512);
-        }
-        if (value >= 60 && value < 80) {
-          return am5.color(0xEFF2B1);
-        }
-        if (value >= 40 && value < 60) {
-          return am5.color(0xA1EDDE);
-        }
-        if (value >= 20 && value < 40) {
-          return am5.color(0x4BDCE3);
-        }
-        if (value < 20) {
-          return am5.color(0x4D93DD);
-        }
-      });
+    series.rectangles.template.adapters.add("fill", function (fill, target) {
+      const value = target.dataItem.get("value");
+      if (value >= 140) {
+        return am5.color(0xF53B3B);
+      }
+      if (value >= 110 && value < 140) {
+        return am5.color(0xFFD512);
+      }
+      if (value >= 80 && value < 110) {
+        return am5.color(0xEFF2B1);
+      }
+      if (value >= 50 && value < 80) {
+        return am5.color(0xA1EDDE);
+      }
+      if (value >= 20 && value < 50) {
+        return am5.color(0x4BDCE3);
+      }
+      if (value < 20) {
+        return am5.color(0x4D93DD);
+      }
+    });
 
-      series.rectangles.template.set("interactive", true);
-      series.rectangles.template.states.create("hover", {
-        fill: am5.color(0x000000),
-        stroke: am5.color(0xffffff),
-      });
+    series.rectangles.template.set("interactive", true);
+    series.rectangles.template.states.create("hover", {
+      fill: am5.color(0x000000),
+      stroke: am5.color(0xffffff),
+    });
 
-      const router = this.$router;
-      series.rectangles.template.events.on("click", function(ev) {
-        const ticker = ev.target.dataItem.dataContext.ticker;
-        router.push(`/stock/${ticker}`)
-      });
+    const router = this.$router;
+    series.rectangles.template.events.on("click", function(ev) {
+      const ticker = ev.target.dataItem.dataContext.ticker;
+      router.push(`/stock/${ticker}`)
+    });
 
-      series.labels.template.setAll({
-        fontSize: 20,
-        fontWeight: 600,
-        fill: am5.color(0xffffff),
-        text: "{ticker}",
-      });
+    series.labels.template.setAll({
+      fontSize: 20,
+      fontWeight: 600,
+      fill: am5.color(0xffffff),
+      text: "{ticker}",
+    });
 
-      series.nodes.template.set(
-        "tooltipText",
-        `[bold]{name}[/]\n${this.units[0].toUpperCase() + this.units.slice(1)}: {sum}`
-      );
+    series.nodes.template.set(
+      "tooltipText",
+      `[bold]{name}[/]\n${this.units[0].toUpperCase() + this.units.slice(1)}: {sum}`
+    );
 
-      series.data.setAll([
-        {
-          name: "Reddit disease map",
-          children: this.tree,
-        },
-      ]);
-      
-      const label = chart.children.unshift(am5.Label.new(rootChart, {
-        text: `S&P 500 stocks weighted by ${this.units} on Reddit`,
-        fontSize: 14,
-        fontWeight: "400",
-        textAlign: "left",
-        x: am5.percent(0),
-        centerX: am5.percent(0),
-        paddingTop: 0,
-        paddingBottom: 0
-      }));
+    series.data.setAll([
+      {
+        name: "Reddit disease map",
+        children: this.tree,
+      },
+    ]);
+    
+    const label = chart.children.unshift(am5.Label.new(rootChart, {
+      text: `S&P 500 stocks weighted by ${this.units} on Reddit`,
+      fontSize: 14,
+      fontWeight: "400",
+      textAlign: "left",
+      x: am5.percent(0),
+      centerX: am5.percent(0),
+      paddingTop: 0,
+      paddingBottom: 0
+    }));
 
-      this.label = label;
-      this.series = series;
-      this.rootChart = rootChart;
+    this.label = label;
+    this.series = series;
+    this.rootChart = rootChart;
 
   },
   watch: {

@@ -6,25 +6,22 @@
     :router="true"
   >
     <el-menu-item index="1" route="/"> Home </el-menu-item>
-    <el-menu-item index="2" route="/stock/:ticker"> Stock </el-menu-item>
+    <el-menu-item index="2" :route="tickerPath"> Stock </el-menu-item>
   </el-menu>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: 'HeaderNav',
   props: ['activeIndex'],
-  data() {
-    return {
-      urls: {
-        "1": "/",
-        "2": "/stock/:ticker",
-      }
-    }
-  },
-  methods: {
-    navigate(ev) {
-      console.log(ev.target)
+  computed: {
+    ...mapGetters({
+      tickers: 'snp500/getTickers'
+    }),
+    tickerPath() {
+      return `/stock/${this.tickers[0]}`;
     }
   }
 }
