@@ -38,7 +38,7 @@ export default {
       }, []);
       this.stocks.forEach((stock) => {
         const treeItem = tree.find((el) => el.name === stock.GICS);
-        if (treeItem && +stock.mentions > this.threshold) {
+        if (treeItem && +stock[this.units] > this.threshold) {
           treeItem.children.push({
             ticker: stock.ticker,
             name: stock.name,
@@ -100,6 +100,12 @@ export default {
         stroke: am5.color(0xffffff),
       });
 
+      const router = this.$router;
+      series.rectangles.template.events.on("click", function(ev) {
+        const ticker = ev.target.dataItem.dataContext.ticker;
+        router.push(`/stock/${ticker}`)
+      });
+
       series.labels.template.setAll({
         fontSize: 20,
         fontWeight: 600,
@@ -118,8 +124,22 @@ export default {
           children: this.tree,
         },
       ]);
+      
+      const label = chart.children.unshift(am5.Label.new(rootChart, {
+        text: `S&P 500 stocks weighted by ${this.units} on Reddit`,
+        fontSize: 14,
+        fontWeight: "400",
+        textAlign: "left",
+        x: am5.percent(0),
+        centerX: am5.percent(0),
+        paddingTop: 0,
+        paddingBottom: 0
+      }));
+
+      this.label = label;
       this.series = series;
       this.rootChart = rootChart;
+
   },
   watch: {
     tree() {
@@ -134,6 +154,7 @@ export default {
             children: this.tree,
           },
         ]);
+        this.label.set('text', `S&P 500 stocks weighted by ${this.units} on Reddit`)
       }
     }
   },  

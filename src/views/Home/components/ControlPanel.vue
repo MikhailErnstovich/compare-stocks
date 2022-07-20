@@ -71,8 +71,21 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .list-toggle {
   align-items: center;
+}
+.el-form{
+  &-item:last-child {
+    margin: 0;
+  }
+}
+@media only screen and (min-width: 450px) {
+  .el-form{
+  &-item:last-child {
+    margin-bottom: 18px;
+    margin-right: 32px;
+  }
+}
 }
 </style>

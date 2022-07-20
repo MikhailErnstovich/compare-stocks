@@ -2,7 +2,7 @@
   <router-view />
 </template>
 <script>
-import Home from "./views/Home/Home.vue";
+import Home from "./views/Home/HomePage.vue";
 
 export default {
   components: { Home },

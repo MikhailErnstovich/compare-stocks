@@ -1,13 +1,13 @@
 <template>
   <el-container class="home">
     <el-header>
-      <HeaderNav />
+      <HeaderNav :activeIndex="'1'"/>
     </el-header>
     <el-container class="main-container">
-      <el-header height="auto">
+      <el-header height="auto" class="main-header">
         <ControlPanel />
       </el-header>
-      <el-main>
+      <el-main class="chart-container">
         <TreeMap />
       </el-main>
       <el-aside
@@ -63,9 +63,9 @@ export default {
       fetchApeStocks: "apeWisdom/fetchStocks",
       toggleList: "home/toggleList",
     }),
-    async fetchData() {
-      await this.fetchSnp500();
-      await this.fetchApeStocks();
+    fetchData() {
+      this.fetchSnp500();
+      this.fetchApeStocks();
     },
   },
   computed: {
@@ -78,8 +78,8 @@ export default {
       },
     },
   },
-  async created() {
-    await this.fetchData();
+  mounted() {
+    this.fetchData();
   },
 };
 </script>
@@ -96,13 +96,19 @@ export default {
   right: 0;
   width: 100%;
   height: 100vh;
-  transform: translateX(0%);
+  transform: translateX(1%);
   z-index: 2;
   background: #ffffff;
   box-shadow: -4px 4px 4px 0px #223c5033, -4px -4px 4px 0px #223c5033;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease-in-out;
   &_hidden {
     transform: translateX(110%);
   }
+}
+.chart-container {
+  padding-top: 0;
+}
+.main-header {
+  padding: 20px;
 }
 </style>
